@@ -13,18 +13,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
         with:
-          python-version: '3.x'
+          node-version: '14'  # You can choose a different Node.js version
 
-      - name: Install SwaggerHub CLI
+      - name: Install SwaggerHub CLI via npm
         run: |
-          pip install swaggerhub-cli
+          npm install -g swaggerhub-cli  # Install SwaggerHub CLI globally
 
       - name: Push changes to SwaggerHub
         env:
           SWAGGERHUB_API_KEY: ${{ secrets.SWAGGERHUB_API_KEY }}  # Use the secret you created earlier
         run: |
           swaggerhub login --api-key $SWAGGERHUB_API_KEY
-          swaggerhub update AuthenticationAPI2 1.0.0 --file ../output/swagger.ysml  
+          swaggerhub update <your-api-name> <your-version> --file ./path-to-your-api-definition.yaml  # Modify the path, API name, and version
