@@ -30,13 +30,19 @@ jobs:
         run: |
           npx swaggerhub --version  # Verify that swaggerhub is available via npx
 
-      # Configure SwaggerHub CLI non-interactively (using environment variables)
+      # Set the environment variables to skip interactive prompts
+      - name: Set SwaggerHub Configuration Environment Variables
+        run: |
+          echo "SWAGGERHUB_URL=https://api.swaggerhub.com" >> $GITHUB_ENV
+          echo "SWAGGERHUB_API_KEY=${{ secrets.SWAGGERHUB_API_KEY }}" >> $GITHUB_ENV
+
+      # Configure SwaggerHub CLI without interaction
       - name: Configure SwaggerHub CLI
         run: |
-          npx swaggerhub configure --url https://api.swaggerhub.com --api-key ${{ secrets.SWAGGERHUB_API_KEY }} --non-interactive
+          npx swaggerhub configure
         env:
+          SWAGGERHUB_URL: https://api.swaggerhub.com
           SWAGGERHUB_API_KEY: ${{ secrets.SWAGGERHUB_API_KEY }}
-
       # Run the SwaggerHub API update command
       - name: Update SwaggerHub API
         run: |
