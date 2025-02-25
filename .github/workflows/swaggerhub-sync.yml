@@ -33,13 +33,13 @@ jobs:
       # Configure SwaggerHub CLI non-interactively (using environment variables)
       - name: Configure SwaggerHub CLI
         run: |
-          swaggerhub configure --url https://api.swaggerhub.com --api-key ${{ secrets.SWAGGERHUB_API_KEY }}
+          npx swaggerhub configure --url https://api.swaggerhub.com --api-key ${{ secrets.SWAGGERHUB_API_KEY }}
         env:
           SWAGGERHUB_API_KEY: ${{ secrets.SWAGGERHUB_API_KEY }}
 
       # Run the SwaggerHub API update command
       - name: Update SwaggerHub API
         run: |
-          swaggerhub api:update marutitechlabs-69b/AuthenticationAPI2/1.0.0 --file ../../output/swagger.yaml
+          npx swaggerhub api:update marutitechlabs-69b/AuthenticationAPI2/1.0.0 --file ../../output/swagger.yaml
         env:
           SWAGGERHUB_API_KEY: ${{ secrets.SWAGGERHUB_API_KEY }}
