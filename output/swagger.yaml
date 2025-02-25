@@ -1,0 +1,151 @@
+asyncapi: 3.0.0
+id: 'urn:uuid:auth-service'
+info:
+  title: Authentication Service
+  version: 1.0.0
+  description: >
+    Service that handles User Registration and Login. It generates JWT tokens
+    and interacts with other services to handle user authentication.
+  contact:
+    name: vthakkar
+servers:
+  production:
+    host: auth-service.example.com
+    protocol: amqp
+channels:
+  loggedin:
+    address: loggedin
+    messages:
+      UserLoggedIn:
+        $ref: '#/components/messages/UserLoggedIn'
+    description: Event fired when a user logs in.
+  registered:
+    address: registered
+    messages:
+      UserRegistered:
+        $ref: '#/components/messages/UserRegistered'
+    description: Event fired when a user registers.
+  PatientDeleted:
+    address: PatientDeleted
+    messages:
+      PatientDeleted:
+        $ref: '#/components/messages/PatientDeleted'
+    description: Consumes event indicating a patient was deleted.
+  DoctorDeleted:
+    address: DoctorDeleted
+    messages:
+      DoctorDeleted:
+        $ref: '#/components/messages/DoctorDeleted'
+    description: Consumes event indicating a doctor was deleted.
+operations:
+  userLoggedIn:
+    action: send
+    channel:
+      $ref: '#/channels/loggedin'
+    summary: Publishes the UserLoggedIn event.
+    messages:
+      - $ref: '#/channels/loggedin/messages/UserLoggedIn'
+  userRegistered:
+    action: send
+    channel:
+      $ref: '#/channels/registered'
+    summary: Publishes the UserRegistered event.
+    messages:
+      - $ref: '#/channels/registered/messages/UserRegistered'
+  patientDeleted:
+    action: receive
+    channel:
+      $ref: '#/channels/PatientDeleted'
+    summary: Subscribes to the PatientDeleted event.
+    messages:
+      - $ref: '#/channels/PatientDeleted/messages/PatientDeleted'
+  doctorDeleted:
+    action: receive
+    channel:
+      $ref: '#/channels/DoctorDeleted'
+    summary: Subscribes to the DoctorDeleted event.
+    messages:
+      - $ref: '#/channels/DoctorDeleted/messages/DoctorDeleted'
+components:
+  messages:
+    UserLoggedIn:
+      name: UserLoggedIn
+      title: User Logged In
+      summary: Event that represents a user successfully logging in.
+      payload:
+        type: object
+        properties:
+          UserId:
+            type: integer
+            description: The UserId of the user
+          Email: 
+            type: string
+            description: The email of the user
+          Role: 
+            type: string
+            description: The role of the user(patient, doctor or admin)
+          LoginTime:
+            type: string
+            format: date
+            description: The Date and Time when the user logged in
+          AccessToken: 
+            type: string
+            description: The access token generated for the user
+          RefreshToken: 
+            type: string
+            description: The refresh token generated for the user
+    UserRegistered:
+      name: UserRegistered
+      title: User Registered
+      summary: Event that represents a user registering.
+      payload:
+        type: object
+        properties:
+          UserId: 
+            type: integer
+            description: The UserId of the user
+          Email: 
+            type: string
+            description: The email of the user
+          Role: 
+            type: string
+            description: The role of the user(patient, doctor or admin)
+          RegisteredAt: 
+            type: string
+            format: date
+            description: The Date and Time when the user registered
+          Username: 
+            type: string
+            description: The username of the user
+    PatientDeleted:
+      name: PatientDeleted
+      title: Patient Deleted
+      summary: Event indicating that a patient was deleted.
+      payload:
+        type: object
+        properties:
+          UserId: 
+            type: integer
+            description: The UserId of the patient
+          PatientId: 
+            type: integer
+            description: The patient id of the patient
+          Name: 
+            type: string
+            description: The name of the patient
+    DoctorDeleted:
+      name: DoctorDeleted
+      title: Doctor Deleted
+      summary: Event indicating that a doctor was deleted.
+      payload:
+        type: object
+        properties:
+          UserId: 
+            type: integer
+            description: The UserId of the doctor
+          DoctorId: 
+            type: integer
+            description: The doctor id of the doctor
+          Name: 
+            type: string
+            description: The name of the doctor
