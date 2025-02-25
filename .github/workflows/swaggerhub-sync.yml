@@ -35,7 +35,6 @@ jobs:
         run: |
           npx swaggerhub configure --url https://api.swaggerhub.com --api-key ${{ secrets.SWAGGERHUB_API_KEY }} --non-interactive
         env:
-        env:
           SWAGGERHUB_API_KEY: ${{ secrets.SWAGGERHUB_API_KEY }}
 
       # Run the SwaggerHub API update command
