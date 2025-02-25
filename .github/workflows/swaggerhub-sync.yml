@@ -16,15 +16,18 @@ jobs:
       - name: Set up Node.js (>= 18.x)
         uses: actions/setup-node@v2
         with:
-          node-version: '18'  # This ensures that Node.js version 18.x is installed
+          node-version: '18'  # Ensures Node.js version 18.x or higher is used
 
       - name: Install SwaggerHub CLI via npm
         run: |
           npm install -g swaggerhub-cli  # Install SwaggerHub CLI globally
 
+      - name: Verify swaggerhub-cli installation
+        run: |
+          swaggerhub --version  # Check if swaggerhub-cli was installed successfully
+
       - name: Push changes to SwaggerHub
         env:
-          SWAGGERHUB_API_KEY: ${{ secrets.SWAGGERHUB_API_KEY }}  # Use the secret you created earlier
+          SWAGGERHUB_API_KEY: ${{ secrets.SWAGGERHUB_API_KEY }}  # Store your SwaggerHub API key in GitHub secrets
         run: |
-          swaggerhub login --api-key $SWAGGERHUB_API_KEY
           swaggerhub update AuthenticationAPI2 1.0.0 --file ../../output/swagger.yaml # Modify the path, API name, and version
