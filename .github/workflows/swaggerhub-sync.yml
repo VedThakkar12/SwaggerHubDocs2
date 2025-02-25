@@ -24,6 +24,9 @@ jobs:
       - name: Install SwaggerHub CLI
         run: |
           npm install -g swaggerhub
+          # Add npm global bin directory to PATH
+          echo "$(npm bin -g)" >> $GITHUB_PATH
+          # Verify if the swaggerhub command is available now
           swaggerhub --version
 
       # Configure SwaggerHub CLI non-interactively (using environment variables)
