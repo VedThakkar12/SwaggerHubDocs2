@@ -1,33 +1,40 @@
-name: Sync to SwaggerHub
+name: Update SwaggerHub API
 
 on:
   push:
     branches:
-      - main  # Change this to the branch you want to sync (e.g., 'main', 'develop')
+      - main  # Change this to your default branch (e.g., 'master' or 'develop')
 
 jobs:
-  sync-to-swaggerhub:
-    runs-on: ubuntu-latest
+  update-swaggerhub:
+    runs-on: ubuntu-latest  # Use GitHub's hosted Ubuntu runner
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      # Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      - name: Set up Node.js (>= 18.x)
-        uses: actions/setup-node@v2
+      # Set up Node.js environment to install dependencies
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
         with:
-          node-version: '18'  # Ensures Node.js version 18.x or higher is used
+          node-version: '14'  # You can use any Node.js version that's compatible with SwaggerHub CLI
 
-      - name: Install SwaggerHub CLI via npm
+      # Install SwaggerHub CLI globally
+      - name: Install SwaggerHub CLI
         run: |
-          npm install -g swaggerhub-cli  # Install SwaggerHub CLI globally
+          npm install -g swaggerhub
 
-      - name: Verify swaggerhub-cli installation
+      # Configure SwaggerHub CLI non-interactively (using environment variables)
+      - name: Configure SwaggerHub CLI
         run: |
-          swaggerhub --version  # Check if swaggerhub-cli was installed successfully
-
-      - name: Push changes to SwaggerHub
+          swaggerhub configure --url https://api.swaggerhub.com --api-key ${{ secrets.SWAGGERHUB_API_KEY }}
         env:
-          SWAGGERHUB_API_KEY: ${{ secrets.SWAGGERHUB_API_KEY }}  # Store your SwaggerHub API key in GitHub secrets
+          SWAGGERHUB_API_KEY: ${{ secrets.SWAGGERHUB_API_KEY }}
+
+      # Run the SwaggerHub API update command
+      - name: Update SwaggerHub API
         run: |
-          swaggerhub update AuthenticationAPI2 1.0.0 --file ../../output/swagger.yaml # Modify the path, API name, and version
+          swaggerhub api:update marutitechlabs-69b/AuthenticationAPI2/1.0.0 --file ../../output/swagger.yaml
+        env:
+          SWAGGERHUB_API_KEY: ${{ secrets.SWAGGERHUB_API_KEY }}
