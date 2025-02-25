@@ -3,49 +3,38 @@ name: Update SwaggerHub API
 on:
   push:
     branches:
-      - main  # Change this to your default branch (e.g., 'master' or 'develop')
+      - main  # Adjust to your default branch if needed
 
 jobs:
   update-swaggerhub:
-    runs-on: ubuntu-latest  # Use GitHub's hosted Ubuntu runner
+    runs-on: ubuntu-latest  # GitHub-hosted Ubuntu runner
 
     steps:
       # Checkout the repository
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Set up Node.js environment to install dependencies
+      # Set up Node.js environment
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'  # You can use any Node.js version that's compatible with SwaggerHub CLI
+          node-version: '18'  # Ensure compatibility with SwaggerHub CLI
 
-      # Install SwaggerHub CLI locally in the project (without global installation)
-      - name: Install SwaggerHub CLI locally
-        run: |
-          npm install swaggerhub-cli  # Install swaggerhub CLI locally
-          
-      # Verify if swaggerhub is installed locally (use npx)
+      # Install SwaggerHub CLI locally
+      - name: Install SwaggerHub CLI
+        run: npm install swaggerhub-cli
+
+      # Verify SwaggerHub CLI installation
       - name: Verify SwaggerHub CLI installation
-        run: |
-          npx swaggerhub --version  # Verify that swaggerhub is available via npx
+        run: npx swaggerhub --version
 
-      # Set the environment variables to skip interactive prompts
-      - name: Set SwaggerHub Configuration Environment Variables
+      # Export SwaggerHub credentials to environment variables
+      - name: Set up SwaggerHub environment variables
         run: |
           echo "SWAGGERHUB_URL=https://api.swaggerhub.com" >> $GITHUB_ENV
           echo "SWAGGERHUB_API_KEY=${{ secrets.SWAGGERHUB_API_KEY }}" >> $GITHUB_ENV
 
-      # Configure SwaggerHub CLI without interaction
-      - name: Configure SwaggerHub CLI
-        run: |
-          npx swaggerhub configure
-        env:
-          SWAGGERHUB_URL: https://api.swaggerhub.com
-          SWAGGERHUB_API_KEY: ${{ secrets.SWAGGERHUB_API_KEY }}
       # Run the SwaggerHub API update command
       - name: Update SwaggerHub API
         run: |
-          npx swaggerhub api:update marutitechlabs-69b/AuthenticationAPI2/1.0.0 --file ../../output/swagger.yaml
-        env:
-          SWAGGERHUB_API_KEY: ${{ secrets.SWAGGERHUB_API_KEY }}
+          npx swaggerhub api:update marutitechlabs-69b/AuthenticationAPI2/1.0.0 --file output/swagger.yaml
