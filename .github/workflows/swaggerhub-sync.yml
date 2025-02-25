@@ -20,14 +20,15 @@ jobs:
         with:
           node-version: '18'  # You can use any Node.js version that's compatible with SwaggerHub CLI
 
-      # Install SwaggerHub CLI globally
-      - name: Install SwaggerHub CLI
+      # Install SwaggerHub CLI locally in the project (without global installation)
+      - name: Install SwaggerHub CLI locally
         run: |
-          npm install -g swaggerhub
-          # Add npm global bin directory to PATH
-          echo "$(npm bin -g)" >> $GITHUB_PATH
-          # Verify if the swaggerhub command is available now
-          swaggerhub --version
+          npm install swaggerhub-cli  # Install swaggerhub CLI locally
+          
+      # Verify if swaggerhub is installed locally (use npx)
+      - name: Verify SwaggerHub CLI installation
+        run: |
+          npx swaggerhub --version  # Verify that swaggerhub is available via npx
 
       # Configure SwaggerHub CLI non-interactively (using environment variables)
       - name: Configure SwaggerHub CLI
