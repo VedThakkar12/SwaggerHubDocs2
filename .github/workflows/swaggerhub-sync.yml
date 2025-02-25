@@ -24,6 +24,7 @@ jobs:
       - name: Install SwaggerHub CLI
         run: |
           npm install -g swaggerhub
+          swaggerhub --version
 
       # Configure SwaggerHub CLI non-interactively (using environment variables)
       - name: Configure SwaggerHub CLI
