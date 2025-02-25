@@ -5,7 +5,7 @@ info:
   version: 1.0.0
   description: >
     Service that handles User Registration and Login. It generates JWT tokens
-    and interacts with other services to handle user authentication(login and registration).
+    and interacts with other services to handle user authentication.
   contact:
     name: vthakkar
 servers:
