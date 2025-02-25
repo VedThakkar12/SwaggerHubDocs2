@@ -7,7 +7,7 @@ info:
     Service that handles User Registration and Login. It generates JWT tokens
     and interacts with other services to handle user authentication(login and register).
   contact:
-    name: vthakkar
+    name: vedthakkar
 servers:
   production:
     host: auth-service.example.com
