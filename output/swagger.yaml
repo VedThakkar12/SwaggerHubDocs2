@@ -18,7 +18,7 @@ channels:
     messages:
       UserLoggedIn:
         $ref: '#/components/messages/UserLoggedIn'
-    description: Event fired when a user logs in.
+    description: Event fired when a user logs in to the system.
   registered:
     address: registered
     messages:
