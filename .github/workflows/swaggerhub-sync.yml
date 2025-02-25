@@ -27,4 +27,4 @@ jobs:
           SWAGGERHUB_API_KEY: ${{ secrets.SWAGGERHUB_API_KEY }}  # Use the secret you created earlier
         run: |
           swaggerhub login --api-key $SWAGGERHUB_API_KEY
-          swaggerhub update <your-api-name> <your-version> --file ./path-to-your-api-definition.yaml  # Modify the path, API name, and version
+          swaggerhub update AuthenticationAPI2 1.0.0 --file ../../output/swagger.yaml # Modify the path, API name, and version
