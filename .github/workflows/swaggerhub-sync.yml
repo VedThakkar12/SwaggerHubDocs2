@@ -34,7 +34,23 @@ jobs:
           echo "SWAGGERHUB_URL=https://api.swaggerhub.com" >> $GITHUB_ENV
           echo "SWAGGERHUB_API_KEY=${{ secrets.SWAGGERHUB_API_KEY }}" >> $GITHUB_ENV
 
+      # Unpublish the API before updating
+      - name: Unpublish SwaggerHub API
+        run: |
+          npx swaggerhub api:unpublish marutitechlabs-69b/AuthenticationAPI2/1.0.0
+        env:
+          SWAGGERHUB_API_KEY: ${{ secrets.SWAGGERHUB_API_KEY }}
+
       # Run the SwaggerHub API update command
       - name: Update SwaggerHub API
         run: |
           npx swaggerhub api:update marutitechlabs-69b/AuthenticationAPI2/1.0.0 --file output/swagger.yaml
+        env:
+          SWAGGERHUB_API_KEY: ${{ secrets.SWAGGERHUB_API_KEY }}
+
+      # Publish the API again after updating
+      - name: Publish SwaggerHub API
+        run: |
+          npx swaggerhub api:publish marutitechlabs-69b/AuthenticationAPI2/1.0.0
+        env:
+          SWAGGERHUB_API_KEY: ${{ secrets.SWAGGERHUB_API_KEY }}
