@@ -24,7 +24,7 @@ channels:
     messages:
       UserRegistered:
         $ref: '#/components/messages/UserRegistered'
-    description: Event fired when a user registers.
+    description: Event fired when a user registers in to the system.
   PatientDeleted:
     address: PatientDeleted
     messages:
