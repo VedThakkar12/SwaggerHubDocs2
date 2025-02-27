@@ -16,7 +16,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
-          fetch-depth: 2  # Ensures we have at least one previous commit
+          fetch-depth: 2  # Ensure we have at least one previous commit
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
@@ -49,22 +49,53 @@ jobs:
             echo "UPDATE_PATIENT=true" >> $GITHUB_ENV
           fi
 
-      # Update AuthenticationAPI2 if output/swagger.yaml changed
-      - name: Update AuthenticationAPI2 in SwaggerHub
+      # Function to check if an API exists
+      - name: Check if AuthenticationAPI2 exists
         if: env.UPDATE_AUTH == 'true'
         run: |
-          npx swaggerhub api:unpublish marutitechlabs-69b/AuthenticationAPI2/1.0.0
-          npx swaggerhub api:update marutitechlabs-69b/AuthenticationAPI2/1.0.0 --file output/swagger.yaml
+          if npx swaggerhub api:get marutitechlabs-69b/AuthenticationAPI2/1.0.0; then
+            echo "AUTH_API_EXISTS=true" >> $GITHUB_ENV
+          else
+            echo "AUTH_API_EXISTS=false" >> $GITHUB_ENV
+          fi
+        env:
+          SWAGGERHUB_API_KEY: ${{ secrets.SWAGGERHUB_API_KEY }}
+
+      - name: Check if PatientService exists
+        if: env.UPDATE_PATIENT == 'true'
+        run: |
+          if npx swaggerhub api:get marutitechlabs-69b/PatientService/1.0.0; then
+            echo "PATIENT_API_EXISTS=true" >> $GITHUB_ENV
+          else
+            echo "PATIENT_API_EXISTS=false" >> $GITHUB_ENV
+          fi
+        env:
+          SWAGGERHUB_API_KEY: ${{ secrets.SWAGGERHUB_API_KEY }}
+
+      # If AuthenticationAPI2 exists, update it; otherwise, create it
+      - name: Update or Create AuthenticationAPI2
+        if: env.UPDATE_AUTH == 'true'
+        run: |
+          if [ "$AUTH_API_EXISTS" == "true" ]; then
+            npx swaggerhub api:unpublish marutitechlabs-69b/AuthenticationAPI2/1.0.0
+            npx swaggerhub api:update marutitechlabs-69b/AuthenticationAPI2/1.0.0 --file output/swagger.yaml
+          else
+            npx swaggerhub api:create marutitechlabs-69b/AuthenticationAPI2/1.0.0 --file output/swagger.yaml --visibility public
+          fi
           npx swaggerhub api:publish marutitechlabs-69b/AuthenticationAPI2/1.0.0
         env:
           SWAGGERHUB_API_KEY: ${{ secrets.SWAGGERHUB_API_KEY }}
 
-      # Update PatientService if output/patientservice.yaml changed
-      - name: Update PatientService in SwaggerHub
+      # If PatientService exists, update it; otherwise, create it
+      - name: Update or Create PatientService
         if: env.UPDATE_PATIENT == 'true'
         run: |
-          npx swaggerhub api:unpublish marutitechlabs-69b/PatientService/1.0.0
-          npx swaggerhub api:update marutitechlabs-69b/PatientService/1.0.0 --file output/patientservice.yaml
+          if [ "$PATIENT_API_EXISTS" == "true" ]; then
+            npx swaggerhub api:unpublish marutitechlabs-69b/PatientService/1.0.0
+            npx swaggerhub api:update marutitechlabs-69b/PatientService/1.0.0 --file output/patientservice.yaml
+          else
+            npx swaggerhub api:create marutitechlabs-69b/PatientService/1.0.0 --file output/patientservice.yaml --visibility public
+          fi
           npx swaggerhub api:publish marutitechlabs-69b/PatientService/1.0.0
         env:
           SWAGGERHUB_API_KEY: ${{ secrets.SWAGGERHUB_API_KEY }}
