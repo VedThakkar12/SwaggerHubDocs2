@@ -18,7 +18,7 @@ channels:
     messages:
       PatientDeleted:
         $ref: '#/components/messages/PatientDeleted'
-    description: Event fired when a patient is deleted.
+    description: Event fired when a patient is deleted from the system.
   UserRegistered:
     address: UserRegistered
     messages:
