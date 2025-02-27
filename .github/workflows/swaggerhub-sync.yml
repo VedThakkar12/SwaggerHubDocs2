@@ -1,56 +1,66 @@
-name: Update SwaggerHub API
+name: Update SwaggerHub APIs
 
 on:
   push:
     branches:
-      - main  # Adjust to your default branch if needed
+      - main
+    paths:
+      - 'output/swagger.yaml'
+      - 'output/patientservice.yaml'
 
 jobs:
   update-swaggerhub:
-    runs-on: ubuntu-latest  # GitHub-hosted Ubuntu runner
+    runs-on: ubuntu-latest
 
     steps:
-      # Checkout the repository
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Set up Node.js environment
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'  # Ensure compatibility with SwaggerHub CLI
+          node-version: '18'
 
-      # Install SwaggerHub CLI locally
       - name: Install SwaggerHub CLI
         run: npm install swaggerhub-cli
 
-      # Verify SwaggerHub CLI installation
       - name: Verify SwaggerHub CLI installation
         run: npx swaggerhub --version
 
-      # Export SwaggerHub credentials to environment variables
       - name: Set up SwaggerHub environment variables
         run: |
           echo "SWAGGERHUB_URL=https://api.swaggerhub.com" >> $GITHUB_ENV
           echo "SWAGGERHUB_API_KEY=${{ secrets.SWAGGERHUB_API_KEY }}" >> $GITHUB_ENV
 
-      # Unpublish the API before updating
-      - name: Unpublish SwaggerHub API
+      # Detect changed AsyncAPI files
+      - name: Detect changed API files
+        id: detect_changes
+        run: |
+          FILE_CHANGED=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^output/')
+          echo "Changed file: $FILE_CHANGED"
+
+          if [[ "$FILE_CHANGED" == "output/swagger.yaml" ]]; then
+            echo "UPDATE_AUTH=true" >> $GITHUB_ENV
+          elif [[ "$FILE_CHANGED" == "output/patientservice.yaml" ]]; then
+            echo "UPDATE_PATIENT=true" >> $GITHUB_ENV
+          fi
+
+      # Update AuthenticationAPI2 if output/swagger.yaml changed
+      - name: Update AuthenticationAPI2 in SwaggerHub
+        if: env.UPDATE_AUTH == 'true'
         run: |
           npx swaggerhub api:unpublish marutitechlabs-69b/AuthenticationAPI2/1.0.0
-        env:
-          SWAGGERHUB_API_KEY: ${{ secrets.SWAGGERHUB_API_KEY }}
-
-      # Run the SwaggerHub API update command
-      - name: Update SwaggerHub API
-        run: |
           npx swaggerhub api:update marutitechlabs-69b/AuthenticationAPI2/1.0.0 --file output/swagger.yaml
+          npx swaggerhub api:publish marutitechlabs-69b/AuthenticationAPI2/1.0.0
         env:
           SWAGGERHUB_API_KEY: ${{ secrets.SWAGGERHUB_API_KEY }}
 
-      # Publish the API again after updating
-      - name: Publish SwaggerHub API
+      # Update PatientService if output/patientservice.yaml changed
+      - name: Update PatientService in SwaggerHub
+        if: env.UPDATE_PATIENT == 'true'
         run: |
-          npx swaggerhub api:publish marutitechlabs-69b/AuthenticationAPI2/1.0.0
+          npx swaggerhub api:unpublish marutitechlabs-69b/PatientService/1.0.0
+          npx swaggerhub api:update marutitechlabs-69b/PatientService/1.0.0 --file output/patientservice.yaml
+          npx swaggerhub api:publish marutitechlabs-69b/PatientService/1.0.0
         env:
           SWAGGERHUB_API_KEY: ${{ secrets.SWAGGERHUB_API_KEY }}
