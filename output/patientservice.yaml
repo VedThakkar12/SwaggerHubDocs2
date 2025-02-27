@@ -1,0 +1,127 @@
+asyncapi: 3.0.0
+id: 'urn:uuid:patient-service'
+info:
+  title: Patient Service
+  version: 1.0.0
+  description: >
+    Service that handles patient-related operations, such as managing patient
+    profiles and appointments.
+  contact:
+    name: vthakkar
+servers:
+  production:
+    host: patient-service.example.com
+    protocol: amqp
+channels:
+  PatientDeleted:
+    address: PatientDeleted
+    messages:
+      PatientDeleted:
+        $ref: '#/components/messages/PatientDeleted'
+    description: Event fired when a patient is deleted.
+  UserRegistered:
+    address: UserRegistered
+    messages:
+      UserRegistered:
+        $ref: '#/components/messages/UserRegistered'
+    description: Consumes event when a user registers.
+  UserLoggedIn:
+    address: UserLoggedIn
+    messages:
+      UserLoggedIn:
+        $ref: '#/components/messages/UserLoggedIn'
+    description: Consumes event when a user logs in.
+    bindings:
+        mqtt:
+          filter:
+            key: Role
+            match: "Patient"
+operations:
+  patientDeleted:
+    action: send
+    channel:
+      $ref: '#/channels/PatientDeleted'
+    summary: Publishes the PatientDeleted event.
+    messages:
+      - $ref: '#/channels/PatientDeleted/messages/PatientDeleted'
+  userRegistered:
+    action: receive
+    channel:
+      $ref: '#/channels/UserRegistered'
+    summary: Subscribes to the UserRegistered event.
+    messages:
+      - $ref: '#/channels/UserRegistered/messages/UserRegistered'
+  userLoggedIn:
+    action: receive
+    channel:
+      $ref: '#/channels/UserLoggedIn'
+    summary: Subscribes to the UserLoggedIn event.
+    messages:
+      - $ref: '#/channels/UserLoggedIn/messages/UserLoggedIn'
+components:
+  messages:
+    PatientDeleted:
+      name: PatientDeleted
+      title: Patient Deleted
+      summary: Event indicating that a patient was deleted.
+      payload:
+        type: object
+        properties:
+          UserId: 
+            type: integer
+            description: The UserId of the patient
+          PatientId: 
+            type: integer
+            description: The patient id of the patient
+          Name: 
+            type: string
+            description: The name of the patient
+    UserRegistered:
+      name: UserRegistered
+      title: User Registered
+      summary: Event that represents a user registering.
+      payload:
+        type: object
+        properties:
+          UserId: 
+            type: integer
+            description: The UserId of the user
+          Email: 
+            type: string
+            description: The email of the user
+          Role: 
+            type: string
+            description: The role of the user(patient, doctor or admin)
+          RegisteredAt: 
+            type: string
+            format: date
+            description: The Date and Time when the user registered
+          Username: 
+            type: string
+            description: The username of the user
+    UserLoggedIn:
+      name: UserLoggedIn
+      title: User Logged In
+      summary: Event that represents a user successfully logging in.
+      payload:
+        type: object
+        properties:
+          UserId:
+            type: integer
+            description: The UserId of the user
+          Email: 
+            type: string
+            description: The email of the user
+          Role: 
+            type: string
+            description: The role of the user(patient, doctor or admin)
+          LoginTime:
+            type: string
+            format: date
+            description: The Date and Time when the user logged in
+          AccessToken: 
+            type: string
+            description: The access token generated for the user
+          RefreshToken: 
+            type: string
+            description: The refresh token generated for the user
