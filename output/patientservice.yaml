@@ -24,7 +24,7 @@ channels:
     messages:
       UserRegistered:
         $ref: '#/components/messages/UserRegistered'
-    description: Consumes event when a user registers.
+    description: Consumes event when a user registers into the system.
   UserLoggedIn:
     address: UserLoggedIn
     messages:
